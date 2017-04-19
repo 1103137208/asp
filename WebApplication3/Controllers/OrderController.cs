@@ -83,7 +83,8 @@ namespace WebApplication3.Controllers
             ViewBag.EmpCodeData = new SelectList(codeService.GetEmp(), "Value", "Text", Order.EmployeeID);
             ViewBag.ShipCodeData = new SelectList(codeService.GetShipper(), "Value", "Text", Order.ShipperID);
             ViewBag.CustCodeData = new SelectList(codeService.GetCustomer(), "Value", "Text", Order.CustomerID);
-            ViewBag.ProductCodeData = this.codeService.GetProduct();
+            ViewBag.ProductCodeData = new SelectList(codeService.GetProduct(), "Value", "Text");
+            
 
             return View(Order);
         }

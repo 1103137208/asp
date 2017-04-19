@@ -98,7 +98,7 @@
                     @for (int i = 0; i < Model.OrderDetail.Count; i++)
                     {
                         <tr>
-                            <td>@Html.DropDownListFor(model => model.OrderDetail[i].ProductID, (List<SelectListItem>)ViewBag.ProductCodeData, new { @class = "ProductId" })</td>
+                            <td>@Html.DropDownListFor(model => model.OrderDetail[i].ProductID, (SelectList)ViewBag.ProductCodeData, new { @class = "ProductId", @Value = Model.OrderDetail[i].ProductID } )</td>
                             <td>@Html.TextBoxFor(model => model.OrderDetail[i].UnitPrice, new { @class = "UnitPrice" })</td>
                             <td>@Html.TextBoxFor(model => model.OrderDetail[i].Qty, new { @class = "Qty" })</td>
                             <td></td>
