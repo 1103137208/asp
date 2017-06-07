@@ -11,7 +11,7 @@ namespace WebApplication3.Models
 
         public string ProductID { get; set; }
 
-        public int UnitPrice { get; set; }
+        public double UnitPrice { get; set; }
 
         public int Qty { get; set; }
     }

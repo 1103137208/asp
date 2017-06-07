@@ -3,101 +3,266 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Helpers;
 
 namespace WebApplication3.Controllers
 {
     public class OrderController : Controller
     {
-        Models.CodeService codeService = new Models.CodeService();
+        Services.CodeService codeService = new Services.CodeService();
         //
         // GET: /Order/
+
+        /// <summary>
+        /// 首頁
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Index()
         {
-            ViewBag.EmpCodeData = this.codeService.GetEmp();
-            ViewBag.ShipCodeData = this.codeService.GetShipper();
-            Models.OrderService orderService = new Models.OrderService();
-            ViewBag.Result = orderService.GetOrder();
             return View("Index");
         }
 
+        /// <summary>
+		/// 新增訂單頁面
+		/// </summary>
         public ActionResult InsertOrder()
         {
-            ViewBag.EmpCodeData = this.codeService.GetEmp();
-            ViewBag.CustCodeData = this.codeService.GetCustomer();
-            ViewBag.ShipCodeData = this.codeService.GetShipper();
-            ViewBag.ProductCodeData = this.codeService.GetProduct();
             return View(new Models.Order());
-            //return View("InsertOrder");
         }
-        
+
+        /// <summary>
+        /// 新增訂單
+        /// </summary>
         [HttpPost()]
-        public ActionResult DoInsertOrder(Models.Order order)
+        public JsonResult DoInsertOrder(Models.Order order)
         {
-            Models.OrderService orderService = new Models.OrderService();
-            int orderid=orderService.InsertOrder(order);
+            Services.OrderService orderService = new Services.OrderService();
+            int orderid = orderService.InsertOrder(order);
             orderService.InsertOrderDetail(order.OrderDetail, orderid);
             ModelState.Clear();
-            return Index();
+            JsonResult result = this.Json(orderid, JsonRequestBehavior.AllowGet);
+            return result;
         }
 
+        /// <summary>
+        /// 首頁資料回傳
+        /// </summary>
         [HttpPost()]
-        public ActionResult Index(Models.OrderSearchArg arg)
+        public JsonResult SelectOrder(Models.OrderSearchArg arg)
         {
-
-            Models.OrderService orderService = new Models.OrderService();
-            
-            if (arg.DeleteOrderId != null)
+            try
             {
-                int s = orderService.DeleteOrderDetailById(arg.DeleteOrderId);
-                if (s == 1)
-                {
-                    ViewBag.Result = orderService.GetOrder();
-                }
-            }
-            else
-            {
-                ViewBag.EmpCodeData = this.codeService.GetEmp();
-                ViewBag.ShipCodeData = this.codeService.GetShipper();
-                ViewBag.Result = orderService.GetOrderByCondtioin(arg);
-            }
+                Services.OrderService orderService = new Services.OrderService();
+                JsonResult result = this.Json(orderService.GetOrderByCondtioin(arg), JsonRequestBehavior.AllowGet);
+                return result;
 
-            return View("index");
+            }
+            catch (Exception)
+            {
+
+                return this.Json(false);
+            }
         }
 
+        /// <summary>
+        /// 刪除訂單
+        /// </summary>
+        [HttpPost()]
+        public JsonResult DeleteOrder(Models.DeleteJson order)
+        {
+            try
+            {
+                string orderid = order.OrderID;
+                Services.OrderService orderService = new Services.OrderService();
+                orderService.DeleteOrderDetailById(orderid);
+                int result = orderService.DeleteOrderById(orderid);
+                if (result >= 1)
+                {
+                    return this.Json(true);
+                }else
+                {
+                    return this.Json(false);
+                }
+
+
+            }
+            catch (Exception)
+            {
+
+                return this.Json(false);
+            }
+
+        }
+
+        /// <summary>
+		/// 修改訂單
+		/// </summary>
         [HttpPost()]
         public ActionResult DoUpdateOrder(Models.Order UpdateData)
         {
-            Models.OrderService orderService = new Models.OrderService();
+
+            Services.OrderService orderService = new Services.OrderService();
             orderService.UpdateOrder(UpdateData);
+            orderService.UpdateOrderDetail(UpdateData.OrderDetail, UpdateData.OrderID);
             ModelState.Clear();
             return Index();
         }
 
+        /// <summary>
+		/// 修改訂單頁面
+		/// </summary>
         [HttpGet]
         public ActionResult UpdateOrder(string Orderid)
         {
-            Models.OrderService orderService = new Models.OrderService();
+            Services.OrderService orderService = new Services.OrderService();
             Models.Order Order = orderService.GetOrderByIdForUpdate(Orderid);
-            //ViewBag.OrderData = Order;
-            ViewBag.Sum = orderService.SumOrderDetailPrice(Order.OrderDetail);
-            ViewBag.EmpCodeData = new SelectList(codeService.GetEmp(), "Value", "Text", Order.EmployeeID);
-            ViewBag.ShipCodeData = new SelectList(codeService.GetShipper(), "Value", "Text", Order.ShipperID);
-            ViewBag.CustCodeData = new SelectList(codeService.GetCustomer(), "Value", "Text", Order.CustomerID);
-            ViewBag.ProductCodeData = new SelectList(codeService.GetProduct(), "Value", "Text");
-            
-
-            return View(Order);
+            ViewBag.OrderData = Order;
+            return View();
         }
 
+        /// <summary>
+		/// 刪除訂單明細
+		///// </summary>
+  //      [HttpPost]
+  //      public JsonResult DeleteOrderDetail(Models.DeleteJson orderdetail)
+  //      {
+  //          try
+  //          {
+  //              string orderid = orderdetail.OrderID;
+  //              string productid = orderdetail.ProductID;
+  //              Services.OrderService orderService = new Services.OrderService();
+  //              int result = orderService.DeleteOrderDetailForUpdate(orderid, productid);
+  //              if (result == 1)
+  //              {
+  //                  return this.Json(true);
+  //              }
+  //              else
+  //              {
+  //                  return this.Json(false);
+  //              }
 
-        ///[HttpGet()]
-        /// public JsonResult TestJson()
-        /// {
-        ///     var result = new Models.Order();
-        ///     result.CustId = "GSS";
-        ////   result.CustName = "瑞陽";
-        ///   return this.Json(result, JsonRequestBehavior.AllowGet);
-        /// }
+  //          }
+  //          catch (Exception)
+  //          {
 
+  //              return this.Json(false);
+  //          }
+
+  //      }
+
+        /// <summary>
+		/// Read
+		/// </summary>
+        public JsonResult Read(Models.OrderSearchArg arg)
+        {
+            try
+            {
+                Services.OrderService orderService = new Services.OrderService();
+                JsonResult result = this.Json(orderService.GetOrderByCondtioin(arg), JsonRequestBehavior.AllowGet);
+                return result;
+
+            }
+            catch (Exception)
+            {
+
+                return this.Json(false);
+            }
+
+        }
+
+        /// <summary>
+		/// 取得員工資料
+		/// </summary>
+        public JsonResult GetEmployeeList()
+        {
+            try
+            {
+                Services.CodeService codeService = new Services.CodeService();
+                JsonResult result = this.Json(codeService.GetEmp(), JsonRequestBehavior.AllowGet);
+                return result;
+
+            }
+            catch (Exception)
+            {
+
+                return this.Json(false);
+            }
+        }
+
+        /// <summary>
+		/// 取得送貨公司
+		/// </summary>
+        public JsonResult GetShipperList()
+        {
+            try
+            {
+                Services.CodeService codeService = new Services.CodeService();
+                JsonResult result = this.Json(codeService.GetShipper(), JsonRequestBehavior.AllowGet);
+                return result;
+
+            }
+            catch (Exception)
+            {
+
+                return this.Json(false);
+            }
+        }
+        
+        /// <summary>
+        /// 取得客戶資料
+        /// </summary>
+        public JsonResult GetCustomerList()
+        {
+            try
+            {
+                Services.CodeService codeService = new Services.CodeService();
+                JsonResult result = this.Json(codeService.GetCustomer(), JsonRequestBehavior.AllowGet);
+                return result;
+
+            }
+            catch (Exception)
+            {
+
+                return this.Json(false);
+            }
+        }
+
+        /// <summary>
+        /// 取得客戶資料
+        /// </summary>
+        public JsonResult GetProductList()
+        {
+            try
+            {
+                Services.CodeService codeService = new Services.CodeService();
+                JsonResult result = this.Json(codeService.GetProduct(), JsonRequestBehavior.AllowGet);
+                return result;
+
+            }
+            catch (Exception)
+            {
+
+                return this.Json(false);
+            }
+        }
+
+        /// <summary>
+        /// 取得客戶資料
+        /// </summary>
+        public JsonResult GetProductPrice()
+        {
+            try
+            {
+                Services.ProductService productService = new Services.ProductService();
+                JsonResult result = this.Json(productService.GetProduct(), JsonRequestBehavior.AllowGet);
+                return result;
+
+            }
+            catch (Exception)
+            {
+
+                return this.Json(false);
+            }
+        }
     }
 }

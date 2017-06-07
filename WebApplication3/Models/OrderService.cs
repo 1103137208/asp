@@ -63,39 +63,6 @@ namespace WebApplication3.Models
             return orderId;
 
         }
-
-        public void InsertOrderDetail(List<OrderDetail> OrderDetail,int orderid)
-        {
-            
-            string sql = @"INSERT INTO [Sales].[OrderDetails]
-                            ([OrderID]
-                            ,[ProductID]
-                            ,[UnitPrice]
-                            ,[Qty])
-                        VALUES
-                            (@OrderID
-                            ,@ProductID
-                            ,@UnitPrice
-                            ,@Qty)";
-            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
-            {
-                conn.Open();
-                for(int i = 0; i < OrderDetail.Count; i++)
-                {
-                    SqlCommand cmd = new SqlCommand(sql, conn);
-                    cmd.Parameters.Add(new SqlParameter("@OrderID", orderid));
-                    cmd.Parameters.Add(new SqlParameter("@ProductID", OrderDetail[i].ProductID));
-                    cmd.Parameters.Add(new SqlParameter("@UnitPrice", OrderDetail[i].UnitPrice));
-                    cmd.Parameters.Add(new SqlParameter("@Qty", OrderDetail[i].Qty));
-
-                    cmd.ExecuteScalar();
-                }
-                
-                conn.Close();
-            }
-        } 
-
-        
         public List<Models.Order> GetOrderById(string orderId)
         {
             DataTable dt = new DataTable();
@@ -150,7 +117,6 @@ namespace WebApplication3.Models
                 sqlAdapter.Fill(dt);
                 conn.Close();
             }
-            List<Models.OrderDetail> OrderDetail = GetOrderDetailById(orderId);
 
             Models.Order result = new Models.Order();
             foreach(DataRow row in dt.Rows)
@@ -160,34 +126,21 @@ namespace WebApplication3.Models
                 result.EmployeeID = (int)row["EmployeeID"];
                 result.EmployeeName = row["EmployeeName"].ToString();
                 result.Freight = (decimal)row["Freight"];
-                result.Orderdate = ChangeDate(row["Orderdate"].ToString());
+                result.Orderdate = row["Orderdate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["Orderdate"];
                 result.OrderID = row["OrderID"].ToString();
-                result.RequireDdate = ChangeDate(row["RequireDdate"].ToString());
+                result.RequireDdate = row["RequireDdate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["RequireDdate"];
                 result.ShipAddress = row["ShipAddress"].ToString();
                 result.ShipCity = row["ShipCity"].ToString();
                 result.ShipCountry = row["ShipCountry"].ToString();
                 result.ShipName = row["ShipName"].ToString();
-                result.ShippedDate = ChangeDate(row["ShippedDate"].ToString());
+                result.ShippedDate = row["ShippedDate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["ShippedDate"];
                 result.ShipperID = (int)row["ShipperID"];
                 result.ShipperName = row["ShipperName"].ToString();
                 result.ShipPostalCode = row["ShipPostalCode"].ToString();
                 result.ShipRegion = row["ShipRegion"].ToString();
-            }
-            result.OrderDetail = OrderDetail;
-
+            } 
             return result;
         }
-
-        private string ChangeDate(string date)
-        {
-            DateTime datetime = Convert.ToDateTime(date);
-            string d = datetime.ToString("yyyy-MM-dd");
-            
-
-            return d;
-        }
-
-        
 
         public List<Models.Order> GetOrder()
         {
@@ -343,43 +296,6 @@ namespace WebApplication3.Models
 
         public void UpdateOrder(Models.Order order)
         {
-            string sql = @"UPDATE [Sales].[Orders]
-                            SET [CustomerID] = @CustomerID
-                            ,[EmployeeID] =@EmployeeID
-                            ,[OrderDate] = @Orderdate
-                            ,[RequiredDate] = @RequireDdate
-                            ,[ShippedDate] = @ShippedDate
-                            ,[ShipperID] = @ShipperID
-                            ,[Freight] =@Freight
-                            ,[ShipName] = @ShipName
-                            ,[ShipAddress] =@ShipAddress
-                            ,[ShipCity] = @ShipCity
-                            ,[ShipRegion] = @ShipRegion
-                            ,[ShipPostalCode] =@ShipPostalCode
-                            ,[ShipCountry] = @ShipCountry
-                            WHERE OrderID=@OrderID";
-            using (SqlConnection conn = new SqlConnection(this.GetDBConnectionString()))
-            {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand(sql, conn);
-                cmd.Parameters.Add(new SqlParameter("@CustomerID", order.CustomerID));
-                cmd.Parameters.Add(new SqlParameter("@EmployeeID", order.EmployeeID));
-                cmd.Parameters.Add(new SqlParameter("@Orderdate", order.Orderdate == null ? string.Empty : order.Orderdate));
-                cmd.Parameters.Add(new SqlParameter("@RequireDdate", order.RequireDdate == null ? string.Empty : order.RequireDdate));
-                cmd.Parameters.Add(new SqlParameter("@ShippedDate", order.ShippedDate == null ? string.Empty : order.ShippedDate));
-                cmd.Parameters.Add(new SqlParameter("@ShipperID", order.ShipperID));
-                cmd.Parameters.Add(new SqlParameter("@Freight", order.Freight));
-                cmd.Parameters.Add(new SqlParameter("@ShipName", order.ShipName == null ? string.Empty : order.ShipName));
-                cmd.Parameters.Add(new SqlParameter("@ShipAddress", order.ShipAddress == null ? string.Empty : order.ShipAddress));
-                cmd.Parameters.Add(new SqlParameter("@ShipCity", order.ShipCity == null ? string.Empty : order.ShipCity));
-                cmd.Parameters.Add(new SqlParameter("@ShipRegion", order.ShipRegion== null ? string.Empty : order.ShipRegion));
-                cmd.Parameters.Add(new SqlParameter("@ShipPostalCode", order.ShipPostalCode == null ? string.Empty : order.ShipPostalCode));
-                cmd.Parameters.Add(new SqlParameter("@ShipCountry", order.ShipCountry == null ? string.Empty : order.ShipCountry));
-                cmd.Parameters.Add(new SqlParameter("@OrderID", order.OrderID));
-                cmd.ExecuteScalar();
-                conn.Close();
-            }
-
         }
 
         ///public List<Models.Order> GetOrders()
@@ -403,14 +319,14 @@ namespace WebApplication3.Models
                     EmployeeID = (int)row["EmployeeID"],
                     EmployeeName = row["EmployeeName"].ToString(),
                     Freight = (decimal)row["Freight"],
-                    Orderdate = row["Orderdate"].ToString(),
+                    Orderdate = row["Orderdate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["Orderdate"],
                     OrderID = row["OrderID"].ToString(),
-                    RequireDdate = row["RequireDdate"].ToString(),
+                    RequireDdate = row["RequireDdate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["RequireDdate"],
                     ShipAddress = row["ShipAddress"].ToString(),
                     ShipCity = row["ShipCity"].ToString(),
                     ShipCountry = row["ShipCountry"].ToString(),
                     ShipName = row["ShipName"].ToString(),
-                    ShippedDate = row["ShippedDate"].ToString(),
+                    ShippedDate = row["ShippedDate"] == DBNull.Value ? (DateTime?)null : (DateTime)row["ShippedDate"],
                     ShipperID = (int)row["ShipperID"],
                     ShipperName = row["ShipperName"].ToString(),
                     ShipPostalCode = row["ShipPostalCode"].ToString(),
@@ -422,7 +338,7 @@ namespace WebApplication3.Models
 
         private List<Models.OrderDetail> MapOrderDetailToList(DataTable orderData)
         {
-            List<Models.OrderDetail> result = new List<Models.OrderDetail>();
+            List<Models.OrderDetail> result = new List<OrderDetail>();
             foreach (DataRow row in orderData.Rows)
             {
                 result.Add(new OrderDetail()

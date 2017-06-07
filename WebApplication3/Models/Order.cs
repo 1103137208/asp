@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -21,36 +22,43 @@ namespace WebApplication3.Models
         /// <summary>
         /// 訂單編號
         /// </summary>
+        [Required()]
         public string OrderID { get; set; }
 
         /// <summary>
         /// 客戶代號
         /// </summary>
+        [Required()]
         public int CustomerID { get; set; }
 
         /// <summary>
         /// 客戶名稱
         /// </summary>
+        [Required()]
         public string CompanyName { get; set; }
 
         /// <summary>
         /// 業務(員工)代號
         /// </summary>
+        [Required()]
         public int EmployeeID { get; set; }
 
         /// <summary>
         /// 業務(員工姓名)
         /// </summary>
+        [Required()]
         public string EmployeeName { get; set; }
 
         /// <summary>
         /// 訂單日期
         /// </summary>
+        [Required()]
         public string Orderdate { get; set; }
 
         /// <summary>
         /// 需要日期
         /// </summary>
+        [Required()]
         public string RequireDdate { get; set; }
 
         /// <summary>
