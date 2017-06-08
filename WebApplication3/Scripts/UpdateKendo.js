@@ -113,6 +113,7 @@ $(document).ready(function () {
                 parseFormats: ["yyyy/MM/dd"]
             });
 
+            //返回按鈕
             $("#BackBtn").kendoButton({
                 click: function () {
                     window.location.href = 'Index';
@@ -123,7 +124,6 @@ $(document).ready(function () {
             $("#UpdateBtn").kendoButton({
                 click: function () {
                     SetOrderDetials();
-                    alert('click');
                     var validator = $("#Form").data("kendoValidator");
                     if (validator.validate()) {
                         $.ajax({
@@ -143,7 +143,6 @@ $(document).ready(function () {
             $("#DeleteBtn").kendoButton({
                 click: function () {
                     var OrderID = $("#OrderID").val();
-                    console.log(OrderID);
                     $.ajax({
                         type: "POST",
                         url: "/Order/DeleteOrder",
@@ -211,9 +210,9 @@ $(document).ready(function () {
                 $('input[itype="Qty"]').kendoNumericTextBox();
             }
 
+            //刪除明細TR
             function RemoveRow(e) {
                 var tr = $(e.event.target.closest('tr'));
-                console.log(tr)
                 if ($('#tbContent tr').length > 1) {
                    tr.remove();
                     Sum();
@@ -238,16 +237,13 @@ $(document).ready(function () {
             function QtyChange(Qty) {
                 var UnitPrice = $(Qty).closest('td').prev().children('input[itype="UnitPrice"]');
                 var Sub = $(Qty).closest('td').next();
-                console.log(Qty)
                 Subtotal($(UnitPrice).val(), $(Qty).val(), Sub);
             }
 
             //根據ProductID改變UnitPrice 並算新的小計
             function ProductIdChange(productid) {
-                console.log(productid);
                 var UnitPrice = $(productid).closest('td').next().children('input[itype="UnitPrice"]');
                 var Qty = $(productid).closest('td').next().next().children().children().children('input[itype="Qty"]');
-                console.log(Qty)
                 var Sub = $(productid).closest('td').next().next().next();
                 for (var i = 0, len = Product.length; i < len; i++) {
                     if (Product[i].ProductID == productid.val()) {
@@ -259,7 +255,6 @@ $(document).ready(function () {
 
             //計算小計
             function Subtotal(UnitPrice, Qty, Sub) {
-                console.log(UnitPrice, Qty)
                 if (Qty > 0) {
                     Sub.text(UnitPrice * Qty);
                 } else {
@@ -281,6 +276,7 @@ $(document).ready(function () {
                 $('#sum').text(sum);
             }
 
+            //載入明細時 計算小計
             $("#tbContent").ready(function () {
                 for (var i = 0 ; i < $('#tbContent tr').length; i++) {
                     var UnitPrice = $('input[itype="UnitPrice"]').eq(i).val();

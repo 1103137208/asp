@@ -129,37 +129,39 @@ namespace WebApplication3.Services
         /// <returns></returns>
         public void UpdateOrderDetail(List<OrderDetail> OrderDetail, string OrderID)
         {
+            orderDao.DeleteOrderDetailById(OrderID);
+                orderDao.InsertOrderDetail(OrderDetail, Convert.ToInt32(OrderID));
             
-            List<OrderDetail> oldOrderDetail = MapOrderDetailToList(orderDao.GetOrderDetailById(OrderID));
-            List<OrderDetail> NewOrderDetail = new List<Models.OrderDetail>();
-            for(int i = 0; i < OrderDetail.Count; i++)
-            {
-                int c = 0;
-                for(int j = 0; j < oldOrderDetail.Count; j++)
-                {
-                    if (OrderDetail[i].ProductID == oldOrderDetail[j].ProductID)
-                    {
-                        c = 1;
-                        orderDao.UpdateOrderDetail(OrderDetail[i], OrderID);
-                        oldOrderDetail[i].ProductID = null;
-                    }
-                }
-                if (c == 0)
-                {
-                        NewOrderDetail.Add(OrderDetail[i]);
-                }
-            }
-            if (NewOrderDetail.Count > 0)
-            {
-                orderDao.InsertOrderDetail(NewOrderDetail, Convert.ToInt32(OrderID));
-            }
-            for (int i = 0; i < oldOrderDetail.Count; i++)
-            {
-                if (oldOrderDetail[i].ProductID != null)
-                {
-                    orderDao.DeleteOrderDetailForUpdate(OrderID, oldOrderDetail[i].ProductID);
-                }
-            }
+            //List<OrderDetail> oldOrderDetail = MapOrderDetailToList(orderDao.GetOrderDetailById(OrderID));
+            //List<OrderDetail> NewOrderDetail = new List<Models.OrderDetail>();
+            //for(int i = 0; i < OrderDetail.Count; i++)
+            //{
+            //    int c = 0;
+            //    for(int j = 0; j < oldOrderDetail.Count; j++)
+            //    {
+            //        if (OrderDetail[i].ProductID == oldOrderDetail[j].ProductID)
+            //        {
+            //            c = 1;
+            //            orderDao.UpdateOrderDetail(OrderDetail[i], OrderID);
+            //            oldOrderDetail[i].ProductID = null;
+            //        }
+            //    }
+            //    if (c == 0)
+            //    {
+            //            NewOrderDetail.Add(OrderDetail[i]);
+            //    }
+            //}
+            //if (NewOrderDetail.Count > 0)
+            //{
+            //    orderDao.InsertOrderDetail(NewOrderDetail, Convert.ToInt32(OrderID));
+            //}
+            //for (int i = 0; i < oldOrderDetail.Count; i++)
+            //{
+            //    if (oldOrderDetail[i].ProductID != null)
+            //    {
+            //        orderDao.DeleteOrderDetailForUpdate(OrderID, oldOrderDetail[i].ProductID);
+            //    }
+            //}
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿
 $(document).ready(function () {
     $(function () {
-        $.getScript("https://kendo.cdn.telerik.com/2017.2.504/js/kendo.all.min.js", function () {
+        $.getScript("../Scripts/kendo.all.min.js", function () {
 
             //查詢結果grid
             $("#grid").kendoGrid({
@@ -128,6 +128,7 @@ $(document).ready(function () {
             $("#ShippedDate").kendoDatePicker();
             $("#RequireDdate").kendoDatePicker();
 
+            //修改訂單
             function UpdateOrder(e) {
                 var tr = e.currentTarget.closest('tr');
                 var dataItem = this.dataItem(tr);
